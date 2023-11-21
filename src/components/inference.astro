@@ -1,0 +1,100 @@
+<astro-inference class="flex items-center space-x-4">
+  <button
+    id="trainBtn"
+    class="bg-yellow-400 font-semibold text-lg rounded px-4 py-2 min-w-[120px] hover:bg-yellow-500"
+  >
+    Train
+  </button>
+  <div class="hidden" id="inferenceContainer">
+    <label class="block">
+      <span>Celsius</span>
+      <input
+        id="celsiusInferenceInput"
+        class="block w-24 border-2 border-black rounded focus:ring-yellow-500 focus:ring-2 outline-none focus:border-black"
+        type="text"
+      />
+    </label>
+    <button
+      id="inferenceBtn"
+      class="bg-yellow-400 font-semibold text-lg rounded px-4 py-2 min-w-[120px] hover:bg-yellow-500"
+    >
+      Infer
+    </button>
+    <label class="block">
+      <span>Fahrenheit</span>
+      <input
+        id="fahrenheitInferenceInput"
+        class="block w-24 border-2 border-black rounded focus:ring-yellow-500 focus:ring-2 outline-none focus:border-black"
+        type="text"
+      />
+    </label>
+  </div>
+</astro-inference>
+
+<script>
+  class AstroInference extends HTMLElement {
+    model = null;
+    loading = false;
+    trained = false;
+    trainButton: HTMLElement | null = null;
+    inferenceButton: HTMLElement | null = null;
+    inferenceContainer: HTMLElement | null = null;
+    celsiusInput: HTMLElement | null = null;
+    fahrenheitInput: HTMLElement | null = null;
+    features = tf.tensor2d([-40, -10, 0, 8, 15, 22, 38], [7, 1]);
+    labels = tf.tensor2d([-40, 14, 32, 46, 59, 72, 100], [7, 1]);
+    getModel;
+    train;
+    infer;
+    constructor() {
+      super();
+      this.trainButton = document.getElementById('trainBtn');
+      this.inferenceButton = document.getElementById('inferenceBtn');
+      this.inferenceContainer = document.getElementById('inferenceContainer');
+      this.celsiusInput = document.getElementById('celsiusInferenceInput');
+      this.fahrenheitInput = document.getElementById(
+        'fahrenheitInferenceInput',
+      );
+
+      this.getModel = () => {
+        this.model = tf.sequential();
+        this.model.add(tf.layers.dense({ units: 1, inputShape: [1] }));
+        this.model.compile({
+          optimizer: tf.train.adam(1),
+          loss: 'meanSquaredError',
+          metrics: ['accuracy'],
+        });
+        return this.model;
+      };
+
+      this.train = async () => {
+        this.trainButton.innerText = 'Training...';
+        this.model = this.getModel();
+        await this.model.fit(this.features, this.labels, {
+          epochs: 500,
+          callbacks: tfvis.show.fitCallbacks(
+            { name: 'My First Surface', tab: 'Input Data' },
+            ['acc', 'loss'],
+            {
+              callbacks: ['onEpochEnd'],
+            },
+          ),
+        });
+        this.inferenceContainer.className = 'items-center space-x-4 flex';
+        this.trainButton.className = 'hidden';
+      };
+
+      this.infer = (temp: number) => {
+        const infered = this.model.predict(tf.tensor2d([temp], [1, 1]));
+        const parsed = infered.dataSync();
+        this.fahrenheitInput.value = parsed[0];
+      };
+      this.trainButton?.addEventListener('click', this.train);
+      this.inferenceButton?.addEventListener('click', () => {
+        const temp = this.celsiusInput.value;
+        this.infer(parseFloat(temp));
+      });
+    }
+  }
+  customElements.define('astro-inference', AstroInference);
+</script>

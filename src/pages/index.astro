@@ -1,0 +1,62 @@
+---
+ 
+import Panel from '../components/panel.astro'
+import CelsiusToFahrenheit from '../components/celsius-to-fahrenheit.astro'
+import AstroInference from '../components/inference.astro';
+
+const celsius = [-40, -10,  0,  8, 15, 22,  38]
+const fahrenheit = [-40,  14, 32, 46, 59, 72, 100]
+---
+
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<meta name="viewport" content="width=device-width" />
+		<meta name="generator" content={Astro.generator} />
+		<title>Astro and Tensorflowjs pratice</title>
+		<script is:inline src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs/dist/tf.min.js"> </script>
+		<script is:inline src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-vis"></script>
+	</head>
+	<body class="bg-yellow-200">
+		<main class="m-auto container p-8">
+			<h1 class="text-3xl font-bold pb-8">Celsius to fahrenheit with tensorflowjs</h1>
+			<div class="flex flex-col items-start space-y-4"> 
+				<h2 class="text-xl font-medium">Give the following temperatures, what would be the fahrenheit value for <strong>42</strong> celsius degrees?</h2>
+				<table class="border-collapse border-2 border-black">
+					<tbody>
+						<tr>
+							<th class="p-2 border-2 border-black">Celsius</th>
+							{celsius.map(val => <th class="p-2 border-2 border-black">{val}</th>)}
+							<th class="p-2 border-2 border-black">42</th>
+						</tr>
+						<tr>
+							<th class="p-2 border border-black">Fahrenheit</th>
+							{fahrenheit.map(val => <th class="p-2 border-2 border-black">{val}</th>)}
+							<th class="p-2 border-2 border-black">?</th>
+						</tr> 
+						</tbody>
+				</table>
+				<p>One way to find the relation between the values is using the line equation.</p>
+				<div class="flex space-x-4">
+					<Panel>
+						<div class="block">
+							<p class="italic">y = mx + b</p>
+							<p class="italic">m = 1.8</p>
+							<p class="italic">b = 32</p>
+						</div>
+					</Panel>
+					<p class="text-3xl bold pt-8">SO</p>
+					<Panel>
+						<p class="italic">F = (1.8 * C) + 32</p>
+					</Panel>
+				</div>
+					<p>and here you can convert the values using the formula</p>
+					<CelsiusToFahrenheit />
+				<p>Let's see how good will be the model predections</p>
+			<AstroInference />
+			</div>   
+		</main>
+		
+	</body>
+</html>

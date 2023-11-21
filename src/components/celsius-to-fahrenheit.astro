@@ -1,0 +1,50 @@
+<celsius-to>
+  <div class="flex space-x-4 items-center">
+    <label class="block">
+      <span>Celsius</span>
+      <input
+        id="celsiusInput"
+        class="block w-24 border-2 border-black rounded focus:ring-yellow-500 focus:ring-2 outline-none focus:border-black"
+        type="text"
+      />
+    </label>
+    <label class="block">
+      <span>Fahrenheit</span>
+      <input
+        id="fahrenheitInput"
+        class="block w-24 border-2 border-black rounded focus:ring-yellow-500 focus:ring-2 outline-none focus:border-black"
+        type="text"
+      />
+    </label>
+  </div>
+</celsius-to>
+
+<!-- since my script is using the document object, it's mandatory to use a script tag -->
+<script>
+  class CelsiusTo extends HTMLElement {
+    constructor() {
+      super();
+      const celsiusToFahrenheit = (temp: number) => 1.8 * temp + 32;
+      const celsiusInput = document.getElementById(
+        'celsiusInput',
+      ) as HTMLInputElement;
+      const fahrenheitInput = document.getElementById(
+        'fahrenheitInput',
+      ) as HTMLInputElement;
+
+      const debouncedConvert = (ev: InputEvent) =>
+        setTimeout(() => {
+          if (ev.target) {
+            const celsiusValue = ev.target.value;
+            const fahrenheitValue = celsiusToFahrenheit(
+              parseFloat(celsiusValue),
+            );
+            fahrenheitInput.value = fahrenheitValue.toString();
+          }
+        }, 500);
+      celsiusInput?.addEventListener('input', debouncedConvert);
+    }
+  }
+  customElements.define('celsius-to', CelsiusTo);
+</script>
+
