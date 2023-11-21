@@ -1,4 +1,4 @@
-<astro-inference class="flex items-center space-x-4">
+<astro-inference>
   <button
     id="trainBtn"
     class="bg-yellow-400 font-semibold text-lg rounded px-4 py-2 min-w-[120px] hover:bg-yellow-500"
@@ -62,7 +62,6 @@
         this.model.compile({
           optimizer: tf.train.adam(1),
           loss: 'meanSquaredError',
-          metrics: ['accuracy'],
         });
         return this.model;
       };
@@ -73,14 +72,14 @@
         await this.model.fit(this.features, this.labels, {
           epochs: 500,
           callbacks: tfvis.show.fitCallbacks(
-            { name: 'My First Surface', tab: 'Input Data' },
-            ['acc', 'loss'],
+            { name: 'Training Metrics', tab: 'Input Data' },
+            ['loss'],
             {
               callbacks: ['onEpochEnd'],
             },
           ),
         });
-        this.inferenceContainer.className = 'items-center space-x-4 flex';
+        this.inferenceContainer.className = 'items-end space-x-4 flex';
         this.trainButton.className = 'hidden';
       };
 
